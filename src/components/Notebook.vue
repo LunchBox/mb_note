@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import Notebook from '@/models/notebook.js'
 import Selection from '@/utils/selection.js'
 
@@ -7,6 +7,14 @@ import Block from './Block.vue'
 
 const _notebook = Notebook.load()
 const note = ref(_notebook)
+
+watch(
+  note,
+  () => {
+    note.value.save()
+  },
+  { deep: true }
+)
 
 const selection = new Selection()
 

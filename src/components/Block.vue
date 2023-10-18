@@ -1,14 +1,19 @@
 <script setup>
-import { ref, nextTick, onMounted } from 'vue'
+import { ref, nextTick, computed } from 'vue'
 import _resize from '@/utils/resizeable.js'
 
 import { js_beautify } from 'js-beautify'
-import jbOption from '@/utils/js_beautify_option.js'
+import jbOption from '@/config/js_beautify.js'
 
 import CodeMirror from 'codemirror'
-import cmOption from '@/utils/codemirror_option.js'
+import cmOption from '@/config/codemirror.js'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/mode/javascript/javascript.js'
+
+import { marked } from 'marked'
+import mdOption from '@/config/marked.js'
+
+marked.setOptions(mdOption)
 
 const props = defineProps({
   block: Object
@@ -22,6 +27,8 @@ const CONTENT_TYPES = ['markdown', 'javascript']
 
 const editing = ref(false)
 const formData = ref({})
+
+const mdContent = computed(() => marked(props.block.content))
 
 function format(content) {
   if (formData.value.contentType === 'javascript') {
@@ -86,9 +93,9 @@ function editMode() {
       </form>
     </div>
     <div v-else @dblclick="editMode">
-      {{ block }}
-      <div>
-        {{ block.content }}
+      <div v-if="block.contentType === 'markdown'" v-html="mdContent"></div>
+      <div v-else>
+        <pre><code :class="`language-${block.contentType}`">{{ block.content }}</code></pre>
       </div>
     </div>
   </div>
@@ -105,6 +112,10 @@ textarea {
   width: 100%;
   overflow-y: hidden;
   min-height: 4.5rem;
+}
+
+pre {
+  font-size: 13px;
 }
 </style>
 

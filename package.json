@@ -12,6 +12,7 @@
   "dependencies": {
     "codemirror": "^5.65.15",
     "js-beautify": "^1.14.9",
+    "marked": "^9.1.2",
     "pinia": "^2.1.6",
     "vue": "^3.3.4"
   },

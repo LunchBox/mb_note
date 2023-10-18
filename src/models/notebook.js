@@ -1,6 +1,6 @@
 import replacer from '@/utils/replacer.js'
-import deepClone from '@/utils/deep_clone.js'
 
+import Base from './base.js'
 import Block from './block.js'
 
 function setItem(key, value) {
@@ -18,21 +18,15 @@ function getItem(key) {
 
 const StorageKey = 'note'
 
-class Notebook {
+class Notebook extends Base {
   constructor(attrs = {}) {
+    super()
+
     this.title = 'First Notebook'
     this.blocks = []
 
     this.loadAttrs(attrs)
-  }
-
-  loadAttrs(attrs = {}) {
-    if (attrs === null) return
-
-    const clone = deepClone(attrs)
-    Object.keys(this).forEach((k) => {
-      if (clone[k] !== undefined) this[k] = clone[k]
-    })
+    this.blocks = this.blocks.map((attrs) => new Block(attrs))
   }
 
   static load() {

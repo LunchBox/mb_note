@@ -1,10 +1,19 @@
 import { randomId } from '@/utils/random.js'
+import Base from './base.js'
 
-class Block {
-  constructor() {
+class Block extends Base {
+  constructor(attrs = {}) {
+    super()
+
     this.id = randomId()
-    this.content_type = 'js'
+    this.contentType = 'javascript'
     this.content = null
+
+    this.loadAttrs(attrs)
+  }
+
+  update(attrs = {}) {
+    this.loadAttrs(attrs)
   }
 }
 

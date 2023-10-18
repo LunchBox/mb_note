@@ -5,9 +5,14 @@ import Selection from '@/utils/selection.js'
 
 import Block from './Block.vue'
 
-const note = ref(new Notebook())
+const _notebook = Notebook.load()
+const note = ref(_notebook)
 
 const selection = new Selection()
+
+function save() {
+  note.value.save()
+}
 
 function addBlock() {
   note.value.addBlock()
@@ -29,7 +34,7 @@ function select(block) {
     <h2>{{ note.title }}</h2>
 
     <div class="toolbar">
-      <a href="#">Save</a>
+      <a href="#" @click.prevent="save">Save</a>
       <a href="#" @click.prevent="addBlock">Add Block</a>
       <a href="#" @click.prevent="deleteBlocks">Delete Selected</a>
     </div>

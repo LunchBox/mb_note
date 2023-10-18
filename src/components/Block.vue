@@ -81,7 +81,7 @@ function editMode() {
             @input="resize"
           ></textarea>
         </div>
-        <div>
+        <div style="padding: 0.25rem 0.5rem">
           <select v-model="formData.contentType">
             <option></option>
             <option v-for="ct in CONTENT_TYPES" :key="ct" :value="ct">
@@ -92,7 +92,7 @@ function editMode() {
         </div>
       </form>
     </div>
-    <div v-else @dblclick="editMode">
+    <div v-else @dblclick="editMode" class="view">
       <div v-if="block.contentType === 'markdown'" v-html="mdContent"></div>
       <div v-else>
         <pre><code :class="`language-${block.contentType}`">{{ block.content }}</code></pre>
@@ -105,6 +105,9 @@ function editMode() {
 .block {
   border: 1px solid #ccc;
   margin: 1rem 0;
+}
+
+.view {
   padding: 1rem;
 }
 

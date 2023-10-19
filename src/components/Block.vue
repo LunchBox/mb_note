@@ -25,7 +25,15 @@ const emit = defineEmits(['after-submit'])
 const textEl = ref(null)
 const resize = () => textEl.value && _resize(textEl.value)
 
-const CONTENT_TYPES = ['markdown', 'javascript']
+const CONTENT_TYPES = ['markdown', 'javascript', 'html']
+
+function isScript(contentType) {
+  return ['javascript', 'html'].includes(contentType)
+}
+
+function isImage(contentType) {
+  return contentType?.startsWith('image')
+}
 
 const editing = ref(false)
 const formData = ref({})
@@ -57,7 +65,7 @@ function onSubmit() {
   emit('after-submit', props.block)
 }
 
-function editMode() {
+function initEditMode() {
   formData.value = { ...props.block }
   editing.value = true
 
@@ -95,7 +103,7 @@ watch(
   () => props.openEditor,
   () => {
     if (props.openEditor) {
-      editMode()
+      initEditMode()
     }
   },
   { immediate: true }
@@ -124,15 +132,23 @@ watch(
         </div>
       </form>
     </div>
-    <div v-else @dblclick.prevent="editMode">
+    <div v-else>
       <div
         v-if="block.contentType === 'markdown'"
         v-html="mdContent"
         class="view markdown"
       ></div>
-      <div v-else v-highlight class="view code">
+      <div
+        v-else-if="isScript(block.contentType)"
+        v-highlight
+        class="view code"
+      >
         <pre><code :class="`language-${block.contentType}`">{{ block.content }}</code></pre>
       </div>
+      <div v-else-if="isImage(block.contentType)" class="view image">
+        <img :src="block.content" />
+      </div>
+      <div v-else>- unknown content type -</div>
     </div>
   </div>
 </template>
@@ -174,6 +190,15 @@ pre {
 .view > :last-child {
   margin-bottom: 0;
 }
+
+img {
+  max-width: 100%;
+  max-height: 400px;
+}
+
+.view.image {
+  margin: 1rem;
+}
 </style>
 
 <style>
@@ -195,6 +220,6 @@ pre {
 }
 
 .block pre code.hljs {
-  padding: 1rem;
+  padding: 0 1rem;
 }
 </style>

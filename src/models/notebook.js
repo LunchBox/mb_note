@@ -37,9 +37,9 @@ class Notebook extends Base {
     setItem(StorageKey, this)
   }
 
-  addBlock(idx = -1) {
-    const block = new Block()
-    if (idx > -1) {
+  addBlock(idx = -1, attrs = {}) {
+    const block = new Block(attrs)
+    if (idx !== null && idx > -1) {
       // insert into idx
       this.blocks.splice(idx, 0, block)
     } else {

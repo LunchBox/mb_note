@@ -6,7 +6,7 @@ class Block extends Base {
     super()
 
     this.id = randomId()
-    this.contentType = 'javascript'
+    this.contentType = 'markdown'
     this.content = null
 
     this.loadAttrs(attrs)

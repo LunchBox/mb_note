@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>JS Runtime</title>
+  </head>
+  <body>
+    <script>
+      function appendScript({ url = '', code = '', type = null, id = null }) {
+        const script = document.createElement('script')
+        if (id !== null) script.id = id
+        
+        if (url && url.trim() !== '') script.setAttribute('src', url)
+        
+        if (code && code.trim() !== '') script.text = code
+        
+        if (type !== null) script.type = type
+
+        script.async = false
+        script.defer = false
+
+        document.body.append(script)
+      }
+
+			// handle content types
+      const operators = {}
+
+      operators['script'] = function (message) {
+        document.querySelectorAll('#rendered-js').forEach((e) => e.remove())
+
+        appendScript({
+          code: message.data,
+          id: 'rendered-js',
+          type: 'module'
+        })
+
+        const info = document.querySelector('#info')
+        if (info) {
+          info.innerHTML = 'exec done!'
+        }
+      }
+
+      operators['external-scritps'] = function (message) {
+        // load
+        message.data.forEach((url) => {
+          if (!url) {
+            return
+          }
+
+          // console.log("-- external script", url);
+          appendScript({ url })
+        })
+      }
+
+      operators['html'] = function (message) {
+        document.querySelector('#inline-html').innerHTML = message.data
+      }
+
+      operators['css'] = function (message) {
+        document.querySelector('#inline-css').innerHTML = message.data
+      }
+
+      const whitelist = [
+				'http://172.18.17.2:5173',
+      ]
+
+      const runtimeHandler = (event) => {
+        // console.log("-- message received in iframe", event);
+
+        // console.log(event.origin);
+        if (!whitelist.includes(event.origin)) return 
+
+        try {
+          if (typeof event.data !== 'string') return 
+
+          // there may be some error on parse a string
+          const message = JSON.parse(event.data)
+          // console.log(message)
+
+          if (typeof operators[message.type] === 'function') {
+            operators[message.type](message)
+          } else {
+            // console.log(message)
+            throw new Error('unknown message')
+          }
+        } catch (e) {
+          console.log(e)
+        }
+      }
+
+      // window.__oo = {
+      //   debug(id, result) {
+      //     // window.parent.window.postMessage({ id, result }, "*");
+      //     parent.postMessage({ type: 'debug', id, result }, '*')
+      //   }
+      // }
+
+      window.addEventListener('message', runtimeHandler)
+
+      // const query = window.location.search
+      // const urlParams = new URLSearchParams(query)
+      // const fid = urlParams.get('fid')
+      // parent.postMessage({ runtimeStatus: 'ready', fid }, '*')
+    </script>
+
+    <!-- built files will be auto injected -->
+    <style id="inline-css"></style>
+    <div id="inline-html">
+      JavaScript runtime is ready.
+      <div id="info"></div>
+    </div>
+  </body>
+</html>

@@ -37,13 +37,25 @@ class Notebook extends Base {
     setItem(StorageKey, this)
   }
 
-  addBlock() {
-    this.blocks.push(new Block())
+  addBlock(idx = -1) {
+    const block = new Block()
+    if (idx > -1) {
+      // insert into idx
+      this.blocks.splice(idx, 0, block)
+    } else {
+      this.blocks.push(block)
+    }
+    return block
   }
 
   deleteBlock(block) {
     const idx = this.blocks.indexOf(block)
     if (idx > -1) this.blocks.splice(idx, 1)
+  }
+
+  getCodes(contentType = 'javascript') {
+    const bs = this.blocks.filter((b) => b.contentType === contentType)
+    return bs.map((b) => b.content).join('\r\n\r\n')
   }
 }
 

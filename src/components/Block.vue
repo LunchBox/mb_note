@@ -1,5 +1,5 @@
 <script setup>
-import { ref, nextTick, computed } from 'vue'
+import { ref, nextTick, computed, watch } from 'vue'
 import _resize from '@/utils/resizeable.js'
 
 import { js_beautify } from 'js-beautify'
@@ -16,19 +16,28 @@ import mdOption from '@/config/marked.js'
 marked.setOptions(mdOption)
 
 const props = defineProps({
-  block: Object
+  block: Object,
+  openEditor: Boolean
 })
 
+const emit = defineEmits(['after-submit'])
+
 const textEl = ref(null)
-const resize = () => _resize(textEl.value)
-nextTick(resize)
+const resize = () => textEl.value && _resize(textEl.value)
 
 const CONTENT_TYPES = ['markdown', 'javascript']
 
 const editing = ref(false)
 const formData = ref({})
 
-const mdContent = computed(() => marked(props.block.content))
+const mdContent = computed(() => {
+  const res = marked(props.block.content || '')?.trim()
+  if (!res || res === '') {
+    return '- no content -'
+  } else {
+    return res
+  }
+})
 
 function format(content) {
   if (formData.value.contentType === 'javascript') {
@@ -44,11 +53,25 @@ function onSubmit() {
 
   props.block.update(attrs)
   editing.value = false
+
+  emit('after-submit', props.block)
 }
 
 function editMode() {
   formData.value = { ...props.block }
   editing.value = true
+
+  nextTick(() => {
+    // clear all text selection
+    window.getSelection()?.removeAllRanges()
+    textEl.value && textEl.value.focus()
+  })
+
+  if (formData.value.contentType !== 'javascript') {
+    nextTick(resize)
+    return
+  }
+
   nextTick(() => {
     const editor = CodeMirror.fromTextArea(textEl.value, cmOption)
     editor.on('change', (cm) => {
@@ -68,11 +91,20 @@ function editMode() {
     })
   })
 }
+watch(
+  () => props.openEditor,
+  () => {
+    if (props.openEditor) {
+      editMode()
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
   <div class="block">
-    <div v-if="editing">
+    <div v-if="editing" style="margin: 0 1rem">
       <form @submit.prevent="onSubmit" @keydown.enter.ctrl="onSubmit">
         <div>
           <textarea
@@ -81,7 +113,7 @@ function editMode() {
             @input="resize"
           ></textarea>
         </div>
-        <div style="padding: 0.25rem 0.5rem">
+        <div style="margin: 0.5rem 0">
           <select v-model="formData.contentType">
             <option></option>
             <option v-for="ct in CONTENT_TYPES" :key="ct" :value="ct">
@@ -92,9 +124,13 @@ function editMode() {
         </div>
       </form>
     </div>
-    <div v-else @dblclick="editMode" class="view">
-      <div v-if="block.contentType === 'markdown'" v-html="mdContent"></div>
-      <div v-else>
+    <div v-else @dblclick.prevent="editMode">
+      <div
+        v-if="block.contentType === 'markdown'"
+        v-html="mdContent"
+        class="view markdown"
+      ></div>
+      <div v-else v-highlight class="view code">
         <pre><code :class="`language-${block.contentType}`">{{ block.content }}</code></pre>
       </div>
     </div>
@@ -102,23 +138,41 @@ function editMode() {
 </template>
 
 <style scoped>
-.block {
-  border: 1px solid #ccc;
-  margin: 1rem 0;
-}
-
-.view {
-  padding: 1rem;
-}
-
 textarea {
+  display: block;
   width: 100%;
   overflow-y: hidden;
   min-height: 4.5rem;
+  line-height: 1.6;
+  font-size: 15px;
+  font-family: 'Source Serif Pro', 'Iowan Old Style', 'Apple Garamond',
+    'Palatino Linotype', 'Times New Roman', 'Droid Serif', Times, serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 }
 
 pre {
   font-size: 13px;
+}
+.block {
+  border-left: 4px solid transparent;
+}
+
+.view {
+  font-family: 'Source Serif Pro', 'Iowan Old Style', 'Apple Garamond',
+    'Palatino Linotype', 'Times New Roman', 'Droid Serif', Times, serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+
+.view.markdown {
+  margin: 1rem;
+  border: 1px solid transparent;
+}
+.view > :first-child {
+  margin-top: 0;
+}
+
+.view > :last-child {
+  margin-bottom: 0;
 }
 </style>
 
@@ -130,5 +184,17 @@ pre {
   height: auto;
 
   line-height: 1.35;
+}
+
+.markdown pre {
+  background: #f6f6f6;
+  padding: 1em;
+  border-radius: 0.5rem;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.block pre code.hljs {
+  padding: 1rem;
 }
 </style>

@@ -18,6 +18,18 @@ class Block extends Base {
   update(attrs = {}) {
     this.loadAttrs(attrs)
   }
+
+  get isEditable() {
+    return ['markdown', 'javascript', 'html'].includes(this.contentType)
+  }
+
+  get isScript() {
+    return ['javascript', 'html'].includes(this.contentType)
+  }
+
+  get isImage() {
+    return this.contentType?.startsWith('image')
+  }
 }
 
 export default Block

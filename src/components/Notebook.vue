@@ -40,6 +40,7 @@ function addBlock(attrs = {}) {
 
 const editingBlock = ref(null)
 function initEditorMode(block) {
+  if (!block.isEditable) return
   editingBlock.value = block
 }
 function exitEditorMode() {

@@ -27,14 +27,6 @@ const resize = () => textEl.value && _resize(textEl.value)
 
 const CONTENT_TYPES = ['markdown', 'javascript', 'html']
 
-function isScript(contentType) {
-  return ['javascript', 'html'].includes(contentType)
-}
-
-function isImage(contentType) {
-  return contentType?.startsWith('image')
-}
-
 const editing = ref(false)
 const formData = ref({})
 
@@ -138,14 +130,10 @@ watch(
         v-html="mdContent"
         class="view markdown"
       ></div>
-      <div
-        v-else-if="isScript(block.contentType)"
-        v-highlight
-        class="view code"
-      >
+      <div v-else-if="block.isScript" v-highlight class="view code">
         <pre><code :class="`language-${block.contentType}`">{{ block.content }}</code></pre>
       </div>
-      <div v-else-if="isImage(block.contentType)" class="view image">
+      <div v-else-if="block.isImage" class="view image">
         <img :src="block.content" />
       </div>
       <div v-else-if="block.isFile" class="view file">

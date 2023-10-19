@@ -148,7 +148,14 @@ watch(
       <div v-else-if="isImage(block.contentType)" class="view image">
         <img :src="block.content" />
       </div>
-      <div v-else>- unknown content type -</div>
+      <div v-else-if="block.isFile" class="view file">
+        <a :href="block.content" target="_blank">{{
+          block.fileName || 'no file name'
+        }}</a>
+      </div>
+      <div v-else class="view">
+        - unknown content type {{ block.contentType }} -
+      </div>
     </div>
   </div>
 </template>
@@ -174,13 +181,13 @@ pre {
 }
 
 .view {
+  margin: 1rem;
   font-family: 'Source Serif Pro', 'Iowan Old Style', 'Apple Garamond',
     'Palatino Linotype', 'Times New Roman', 'Droid Serif', Times, serif,
     'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 }
 
 .view.markdown {
-  margin: 1rem;
   border: 1px solid transparent;
 }
 .view > :first-child {
@@ -194,10 +201,6 @@ pre {
 img {
   max-width: 100%;
   max-height: 400px;
-}
-
-.view.image {
-  margin: 1rem;
 }
 </style>
 
@@ -220,6 +223,6 @@ img {
 }
 
 .block pre code.hljs {
-  padding: 0 1rem;
+  padding: 0;
 }
 </style>

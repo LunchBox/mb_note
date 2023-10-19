@@ -115,6 +115,7 @@ function onPaste(event) {
   Array.from(items).forEach((item) => {
     if (item.kind === 'file') {
       var blob = item.getAsFile()
+      console.log(blob)
       if (blob == null) {
         console.log('-- blob is null, try next one')
       } else {
@@ -123,9 +124,11 @@ function onPaste(event) {
         blobtoDataURL(blob, (dataURL) => {
           const block = addBlock({
             contentType: blob.type,
-            content: dataURL
+            content: dataURL,
+            isFile: true,
+            fileName: blob.name
           })
-          console.log(block)
+          selection.select(block)
         })
       }
     }

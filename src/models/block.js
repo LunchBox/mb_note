@@ -9,6 +9,9 @@ class Block extends Base {
     this.contentType = 'markdown'
     this.content = null
 
+    this.isFile = false
+    this.fileName = null
+
     this.loadAttrs(attrs)
   }
 

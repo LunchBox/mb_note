@@ -18,15 +18,18 @@ async function pickFile() {
 watch(
   () => note.value?.dump(),
   () => {
-    save()
+    if (note.value._allowSave) save()
   },
   { deep: true }
 )
 
 const selection = new Selection()
+const savingToFile = ref(false)
 
-function save() {
-  note.value.saveToFile()
+async function save() {
+  savingToFile.value = true
+  await note.value.saveToFile()
+  savingToFile.value = false
 }
 
 function addBlock(attrs = {}) {
@@ -174,7 +177,9 @@ function run() {
         <h2>{{ note.title }}</h2>
 
         <div class="toolbar">
-          <button @click.prevent="save">Save</button>
+          <button @click.prevent="save">
+            {{ savingToFile ? 'Saving...' : 'Save' }}
+          </button>
           <a href="#" @click.prevent="addBlock">Add Block</a>
           <a href="#" @click.prevent="deleteBlocks">Delete Selected</a>
 

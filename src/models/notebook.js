@@ -18,6 +18,17 @@ import Block from './block.js'
 
 // const StorageKey = 'note'
 
+const FILE_OPTIONS = {
+  types: [
+    {
+      description: 'JS Notebook(.jsnb)',
+      accept: {
+        'text/plain': ['.jsnb']
+      }
+    }
+  ]
+}
+
 class Notebook extends Base {
   constructor(attrs = {}) {
     super()
@@ -28,6 +39,7 @@ class Notebook extends Base {
     this.loadAttrs(attrs)
     this.blocks = this.blocks.map((attrs) => new Block(attrs))
 
+    this._allowSave = false
     this._fileHandle = null
   }
 
@@ -40,18 +52,7 @@ class Notebook extends Base {
   // }
 
   static async loadFromFile() {
-    const fileOption = {
-      types: [
-        {
-          description: 'JS Notebook(.jsnb)',
-          accept: {
-            'text/plain': ['.jsnb']
-          }
-        }
-      ]
-    }
-
-    const [fileHandle] = await window.showOpenFilePicker(fileOption)
+    const [fileHandle] = await window.showOpenFilePicker(FILE_OPTIONS)
     const file = await fileHandle.getFile()
     const content = await file.text()
 
@@ -59,6 +60,14 @@ class Notebook extends Base {
       const str = content.trim() === '' ? undefined : JSON.parse(content)
       const nb = new Notebook(str)
       nb._fileHandle = fileHandle
+
+      try {
+        fileHandle.createWritable() // fire a write confirm box to ask permission
+        this._allowSave = true
+      } catch (err) {
+        console.log(err)
+      }
+
       return nb
     } else {
       throw new Error('failed to load file!')
@@ -66,10 +75,6 @@ class Notebook extends Base {
   }
 
   async saveToFile() {
-    if (!this._fileHandle) {
-      alert('no target file specified')
-      return
-    }
     const writable = await this._fileHandle.createWritable()
     await writable.write(this.dump())
     await writable.close()

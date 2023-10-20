@@ -19,6 +19,10 @@ class Block extends Base {
     this.loadAttrs(attrs)
   }
 
+  get isMarkdown() {
+    return this.contentType === 'markdown'
+  }
+
   get isEditable() {
     return ['markdown', 'javascript', 'html'].includes(this.contentType)
   }

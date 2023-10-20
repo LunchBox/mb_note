@@ -7,13 +7,18 @@ import Block from './Block.vue'
 
 const debugMark = Math.round(Math.random() * 100000000)
 
-const _notebook = Notebook.load()
-const note = ref(_notebook)
+// const _notebook = await Notebook.loadFromFile()
+const note = ref(null)
+
+async function pickFile() {
+  const _nb = await Notebook.loadFromFile()
+  note.value = _nb
+}
 
 watch(
-  note,
+  () => note.value?.dump(),
   () => {
-    note.value.save()
+    save()
   },
   { deep: true }
 )
@@ -21,7 +26,7 @@ watch(
 const selection = new Selection()
 
 function save() {
-  note.value.save()
+  note.value.saveToFile()
 }
 
 function addBlock(attrs = {}) {
@@ -37,6 +42,8 @@ function addBlock(attrs = {}) {
     return note.value.addBlock(null, attrs)
   }
 }
+
+// init editor mode on double click
 
 const editingBlock = ref(null)
 function initEditorMode(block) {
@@ -120,8 +127,7 @@ function onPaste(event) {
       if (blob == null) {
         console.log('-- blob is null, try next one')
       } else {
-        console.log('blob size: ' + blob.size + ' type: ' + blob.type)
-        // formData.append('files[]', blob, blob.name)
+        // console.log('blob size: ' + blob.size + ' type: ' + blob.type)
         blobtoDataURL(blob, (dataURL) => {
           const block = addBlock({
             contentType: blob.type,
@@ -157,32 +163,39 @@ function run() {
 </script>
 
 <template>
-  <div @paste="onPaste">
-    <div class="page-head">
-      <h2>{{ note.title }}</h2>
+  <div>
+    <div v-if="!note">
+      <button @click.prevent="pickFile">
+        Pick a .jsnb file(or create a blank file with .jsnb ext)
+      </button>
+    </div>
+    <div v-else @paste="onPaste">
+      <div class="page-head">
+        <h2>{{ note.title }}</h2>
 
-      <div class="toolbar">
-        <a href="#" @click.prevent="save">Save</a>
-        <a href="#" @click.prevent="addBlock">Add Block</a>
-        <a href="#" @click.prevent="deleteBlocks">Delete Selected</a>
+        <div class="toolbar">
+          <button @click.prevent="save">Save</button>
+          <a href="#" @click.prevent="addBlock">Add Block</a>
+          <a href="#" @click.prevent="deleteBlocks">Delete Selected</a>
 
-        <a href="#" @click.prevent="run">Run</a>
+          <!-- <a href="#" @click.prevent="run">Run</a> -->
+        </div>
+
+        <!-- <iframe :src="`/debug.html?t=${debugMark}`" ref="runtime"></iframe> -->
       </div>
 
-      <iframe :src="`/debug.html?t=${debugMark}`" ref="runtime"></iframe>
-    </div>
-
-    <div class="blocks">
-      <block
-        v-for="block in note.blocks"
-        :key="block.id"
-        :block="block"
-        :open-editor="editingBlock === block"
-        :class="{ selected: selection.has(block) }"
-        @click="select(block)"
-        @after-submit="exitEditorMode()"
-        @dblclick.prevent="initEditorMode(block)"
-      ></block>
+      <div class="blocks">
+        <block
+          v-for="block in note.blocks"
+          :key="block.id"
+          :block="block"
+          :open-editor="editingBlock === block"
+          :class="{ selected: selection.has(block) }"
+          @click="select(block)"
+          @after-submit="exitEditorMode()"
+          @dblclick.prevent="initEditorMode(block)"
+        ></block>
+      </div>
     </div>
   </div>
 </template>

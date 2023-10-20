@@ -49,7 +49,6 @@ function format(content) {
 function onSubmit() {
   const attrs = { ...formData.value }
   attrs.content = format(attrs.content)
-  console.log(attrs)
 
   props.block.update(attrs)
   editing.value = false
@@ -73,7 +72,10 @@ function initEditMode() {
   // }
 
   nextTick(() => {
-    const editor = CodeMirror.fromTextArea(textEl.value, cmOption)
+    const options = { ...cmOption }
+    if (formData.value.contentType === 'markdown') options.lineNumbers = false
+
+    const editor = CodeMirror.fromTextArea(textEl.value, options)
     editor.on('change', (cm) => {
       formData.value.content = cm.getValue()
     })
@@ -164,6 +166,8 @@ textarea {
 
 pre {
   font-size: 13px;
+  background: #f6f6f6;
+  border-radius: 0.5rem;
 }
 .block {
   border-left: 4px solid transparent;

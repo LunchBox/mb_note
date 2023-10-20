@@ -67,10 +67,10 @@ function initEditMode() {
     textEl.value && textEl.value.focus()
   })
 
-  if (formData.value.contentType !== 'javascript') {
-    nextTick(resize)
-    return
-  }
+  // if (formData.value.contentType !== 'javascript') {
+  //   nextTick(resize)
+  //   return
+  // }
 
   nextTick(() => {
     const editor = CodeMirror.fromTextArea(textEl.value, cmOption)
@@ -128,6 +128,7 @@ watch(
       <div
         v-if="block.contentType === 'markdown'"
         v-html="mdContent"
+        v-highlight
         class="view markdown"
       ></div>
       <div v-else-if="block.isScript" v-highlight class="view code">
@@ -204,13 +205,11 @@ img {
 
 .markdown pre {
   background: #f6f6f6;
-  padding: 1em;
   border-radius: 0.5rem;
   font-size: 13px;
-  line-height: 1.3;
 }
 
 .block pre code.hljs {
-  padding: 0;
+  background: transparent;
 }
 </style>

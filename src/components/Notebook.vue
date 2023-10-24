@@ -147,7 +147,6 @@ function filterHeaders() {
 
   hs.forEach(applyNode)
   headers.value = root
-  console.log(root)
 }
 
 function deleteBlocks() {

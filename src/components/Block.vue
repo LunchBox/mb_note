@@ -168,6 +168,7 @@ pre {
   font-size: 13px;
   background: #f6f6f6;
   border-radius: 0.5rem;
+  tab-size: 2;
 }
 .block {
   border-left: 4px solid transparent;

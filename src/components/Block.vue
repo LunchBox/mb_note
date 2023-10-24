@@ -1,5 +1,6 @@
 <script setup>
 import { ref, nextTick, computed, watch } from 'vue'
+import { randomId } from '@/utils/random.js'
 import _resize from '@/utils/resizeable.js'
 
 import { js_beautify } from 'js-beautify'
@@ -102,6 +103,8 @@ watch(
   },
   { immediate: true }
 )
+
+const ctId = randomId()
 </script>
 
 <template>
@@ -116,12 +119,12 @@ watch(
           ></textarea>
         </div>
         <div style="margin: 0.5rem 0">
-          <select v-model="formData.contentType">
-            <option></option>
+          <input type="text" v-model="formData.contentType" :list="ctId" />
+          <datalist :id="ctId">
             <option v-for="ct in CONTENT_TYPES" :key="ct" :value="ct">
               {{ ct }}
             </option>
-          </select>
+          </datalist>
           <input type="submit" value="update" />
         </div>
       </form>
@@ -133,19 +136,16 @@ watch(
         v-highlight
         class="view markdown"
       ></div>
-      <div v-else-if="block.isScript" v-highlight class="view code">
-        <pre><code :class="`language-${block.contentType}`">{{ block.content }}</code></pre>
-      </div>
       <div v-else-if="block.isImage" class="view image">
         <img :src="block.content" />
       </div>
       <div v-else-if="block.isFile" class="view file">
-        <a :href="block.content" target="_blank">{{
-          block.fileName || 'no file name'
-        }}</a>
+        <a :href="block.content" target="_blank">
+          {{ block.fileName || 'no file name' }}
+        </a>
       </div>
-      <div v-else class="view">
-        - unknown content type {{ block.contentType }} -
+      <div v-else v-highlight class="view code">
+        <pre><code :class="`language-${block.contentType}`">{{ block.content }}</code></pre>
       </div>
     </div>
   </div>

@@ -62,8 +62,8 @@ class Notebook extends Base {
       nb._fileHandle = fileHandle
 
       try {
-        fileHandle.createWritable() // fire a write confirm box to ask permission
-        this._allowSave = true
+        await fileHandle.createWritable() // fire a write confirm box to ask permission
+        nb._allowSave = true
       } catch (err) {
         console.log(err)
       }

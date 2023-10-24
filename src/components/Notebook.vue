@@ -1,9 +1,11 @@
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, nextTick } from 'vue'
+import { randomId } from '@/utils/random.js'
 import Notebook from '@/models/notebook.js'
 import Selection from '@/utils/selection.js'
 
 import Block from './Block.vue'
+import HList from './HList.vue'
 
 const debugMark = Math.round(Math.random() * 100000000)
 
@@ -15,10 +17,14 @@ async function pickFile() {
   note.value = _nb
 }
 
+const headers = ref(null)
+
 watch(
   () => note.value?.dump(),
   () => {
     if (note.value._allowSave) save()
+
+    nextTick(filterHeaders)
   },
   { deep: true }
 )
@@ -97,6 +103,52 @@ document.addEventListener('keydown', (e) => {
     }
   })
 })
+
+class Node {
+  constructor(el = null) {
+    this._el = el
+    if (el === null) {
+      this.lv = '0'
+    } else {
+      this.id = randomId()
+      el.id = this.id
+      const m = el.tagName.match(/H(\d)/)
+      this.lv = m[1]
+      this.text = el.textContent
+    }
+    this.parent = null
+    this.children = []
+  }
+}
+
+function filterHeaders() {
+  const hs = document.querySelectorAll('.blocks :is(h1, h2, h3, h4, h5, h6)')
+  console.log(hs)
+
+  const root = new Node()
+  let current = root
+
+  const applyNode = (el) => {
+    const node = new Node(el)
+
+    if (node.lv > current.lv) {
+      current.children.push(node)
+      node.parent = current
+      current = node
+    } else if (node.lv < current.lv) {
+      current = current.parent
+      applyNode(el)
+    } else {
+      current.parent.children.push(node)
+      node.parent = current.parent
+      current = node
+    }
+  }
+
+  hs.forEach(applyNode)
+  headers.value = root
+  console.log(root)
+}
 
 function deleteBlocks() {
   if (!confirm('Are you sure?')) return
@@ -193,6 +245,10 @@ function run() {
         </div>
 
         <!-- <iframe :src="`/debug.html?t=${debugMark}`" ref="runtime"></iframe> -->
+      </div>
+
+      <div class="outline">
+        <h-list :node="headers"></h-list>
       </div>
 
       <div class="blocks">

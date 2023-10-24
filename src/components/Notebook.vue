@@ -33,17 +33,25 @@ async function save() {
 }
 
 function addBlock(attrs = {}) {
+  let block = null
   if (selection.onlyOne) {
-    const block = selection.first
+    block = selection.first
     const idx = note.value.blocks.indexOf(block)
     if (idx > -1) {
-      return note.value.addBlock(idx + 1, attrs)
+      block = note.value.addBlock(idx + 1, attrs)
     } else {
-      return note.value.addBlock(null, attrs)
+      block = note.value.addBlock(null, attrs)
     }
   } else {
-    return note.value.addBlock(null, attrs)
+    block = note.value.addBlock(null, attrs)
   }
+
+  if (block !== null) {
+    selection.select(block)
+    editingBlock.value = block
+  }
+
+  return block
 }
 
 // init editor mode on double click
@@ -64,9 +72,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key !== 'Enter') return
   if (e.ctrlKey || e.metaKey) return
 
-  const block = addBlock()
-  selection.select(block)
-  editingBlock.value = block
+  addBlock()
 })
 
 // 按住 alt + 箭頭時上下移動 block
@@ -174,7 +180,7 @@ function run() {
     </div>
     <div v-else @paste="onPaste">
       <div class="page-head">
-        <h2>{{ note.title }}</h2>
+        <h2>{{ note._filename }}</h2>
 
         <div class="toolbar">
           <button @click.prevent="save">

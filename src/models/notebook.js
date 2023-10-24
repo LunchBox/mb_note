@@ -33,7 +33,6 @@ class Notebook extends Base {
   constructor(attrs = {}) {
     super()
 
-    this.title = 'First Notebook'
     this.blocks = []
 
     this.loadAttrs(attrs)
@@ -41,6 +40,7 @@ class Notebook extends Base {
 
     this._allowSave = false
     this._fileHandle = null
+    this._filename = null
   }
 
   // static load() {
@@ -60,6 +60,7 @@ class Notebook extends Base {
       const str = content.trim() === '' ? undefined : JSON.parse(content)
       const nb = new Notebook(str)
       nb._fileHandle = fileHandle
+      nb._filename = file.name
 
       try {
         await fileHandle.createWritable() // fire a write confirm box to ask permission

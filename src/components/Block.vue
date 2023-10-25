@@ -106,7 +106,7 @@ const ctId = randomId()
 </script>
 
 <template>
-  <div class="block" @keydown.enter.stop>
+  <div class="block" :class="block.contentType" @keydown.enter.stop>
     <div v-if="editing" style="margin: 0 1rem">
       <form @submit.prevent="onSubmit" @keydown.enter.ctrl="onSubmit">
         <div>
@@ -204,8 +204,11 @@ img {
 </style>
 
 <style>
+.markdown .CodeMirror {
+  font-size: var(--font-size);
+}
 .CodeMirror {
-  /* font-size: 13px; */
+  font-size: 13px;
   border: 1px solid #eee;
   margin: var(--p-margin) 0;
   height: auto;
@@ -217,7 +220,7 @@ img {
 .markdown pre {
   background: #f6f6f6;
   border-radius: 0.5rem;
-  font-size: 13px;
+  /* font-size: 13px; */
 }
 
 .block pre code.hljs {

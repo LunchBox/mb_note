@@ -72,6 +72,15 @@ document.addEventListener('keydown', (e) => {
   addBlock()
 })
 
+// 按下 e 開啟編輯模式
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey || e.metaKey) return
+  if (!selection.onlyOne) return
+  if (!['e'].includes(e.key)) return
+
+  editingBlock.value = selection.first
+})
+
 // 按住 alt + 箭頭時上下移動 block
 document.addEventListener('keydown', (e) => {
   if (!selection.any) return

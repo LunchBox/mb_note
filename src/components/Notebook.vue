@@ -279,8 +279,9 @@ function run() {
           :key="block.id"
           :block="block"
           :class="{ selected: selection.has(block) }"
-          @click="select(block)"
           :open-editor="editingBlock === block"
+          @click="select(block)"
+          @after-submit="editingBlock = null"
         ></block>
       </div>
     </div>

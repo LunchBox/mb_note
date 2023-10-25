@@ -127,7 +127,7 @@ const ctId = randomId()
         </div>
       </form>
     </div>
-    <div v-else @dblclick.prevent.stop="initEditMode">
+    <div v-else>
       <div
         v-if="block.contentType === 'markdown'"
         v-html="mdContent"

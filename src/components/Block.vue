@@ -106,8 +106,8 @@ const ctId = randomId()
 </script>
 
 <template>
-  <div class="block" :class="block.contentType" @keydown.enter.stop>
-    <div v-if="editing" style="margin: 0 1rem">
+  <div class="block" :class="block.contentType">
+    <div v-if="editing" style="margin: 0 1rem" @keydown.stop>
       <form @submit.prevent="onSubmit" @keydown.enter.ctrl="onSubmit">
         <div>
           <textarea

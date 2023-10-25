@@ -39,6 +39,7 @@ async function save() {
 }
 
 const editingBlock = ref(null)
+
 function addBlock(attrs = {}) {
   let block = null
   if (selection.onlyOne) {
@@ -55,17 +56,17 @@ function addBlock(attrs = {}) {
 
   if (block !== null) {
     selection.select(block)
-    editingBlock.value = block
+
+    if (!block.isFile) editingBlock.value = block
   }
 
   return block
 }
 
-// 按下 enter 的時候在當前位置插入 block
+// 按下 enter 或者 o 的時候在當前位置插入 block
 document.addEventListener('keydown', (e) => {
   if (!selection.onlyOne) return
-  // if (editingBlock.value) return
-  if (e.key !== 'Enter') return
+  if (!['Enter', 'o'].includes(e.key)) return
   if (e.ctrlKey || e.metaKey) return
 
   addBlock()
@@ -74,7 +75,6 @@ document.addEventListener('keydown', (e) => {
 // 按住 alt + 箭頭時上下移動 block
 document.addEventListener('keydown', (e) => {
   if (!selection.any) return
-  // if (editingBlock.value) return
   if (!(e.metaKey || e.altKey)) return // alt
   if (!['ArrowUp', 'ArrowDown'].includes(e.key)) return
 
@@ -109,6 +109,15 @@ document.addEventListener('keydown', (e) => {
 //     }
 //   }
 // })
+
+// j,k 上下移動
+document.addEventListener('keydown', (e) => {
+  if (!selection.any) return
+  if (!['j', 'k'].includes(e.key)) return
+  const node =
+    e.key === 'j' ? selection.first.nextNode : selection.first.prevNode
+  if (node) selection.select(node)
+})
 
 class Node {
   constructor(el = null) {

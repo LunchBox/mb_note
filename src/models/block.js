@@ -42,6 +42,12 @@ class Block extends Base {
     return null
   }
 
+  get nextNode() {
+    if (!this._parent) return null
+    const idx = this._parent.getBlockIdx(this)
+    return this._parent.getBlockAtIdx(idx + 1)
+  }
+
   addChild(block) {
     if (this.children.includes(block)) return
     this.children.push(block)

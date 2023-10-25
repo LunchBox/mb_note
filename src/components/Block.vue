@@ -106,7 +106,7 @@ const ctId = randomId()
 </script>
 
 <template>
-  <div class="block" @dblclick.prevent.stop="initEditMode" @keydown.enter.stop>
+  <div class="block" @keydown.enter.stop>
     <div v-if="editing" style="margin: 0 1rem">
       <form @submit.prevent="onSubmit" @keydown.enter.ctrl="onSubmit">
         <div>
@@ -127,7 +127,7 @@ const ctId = randomId()
         </div>
       </form>
     </div>
-    <div v-else>
+    <div v-else @dblclick.prevent.stop="initEditMode">
       <div
         v-if="block.contentType === 'markdown'"
         v-html="mdContent"
@@ -205,10 +205,11 @@ img {
 
 <style>
 .CodeMirror {
-  font-size: 13px;
+  /* font-size: 13px; */
   border: 1px solid #eee;
   margin: var(--p-margin) 0;
   height: auto;
+  color: var(--color-text);
 
   line-height: 1.35;
 }

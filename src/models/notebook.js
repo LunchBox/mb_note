@@ -36,7 +36,12 @@ class Notebook extends Base {
     this.blocks = []
 
     this.loadAttrs(attrs)
-    this.blocks = this.blocks.map((attrs) => new Block(attrs))
+
+    this.blocks = this.blocks.map((attrs) => {
+      const b = new Block(attrs)
+      b._parent = this
+      return b
+    })
 
     this._allowSave = false
     this._fileHandle = null
@@ -87,6 +92,8 @@ class Notebook extends Base {
 
   addBlock(idx = -1, attrs = {}) {
     const block = new Block(attrs)
+    block._parent = this
+
     if (idx !== null && idx > -1) {
       // insert into idx
       this.blocks.splice(idx, 0, block)
@@ -99,6 +106,14 @@ class Notebook extends Base {
   deleteBlock(block) {
     const idx = this.blocks.indexOf(block)
     if (idx > -1) this.blocks.splice(idx, 1)
+  }
+
+  getBlockIdx(block) {
+    return this.blocks.indexOf(block)
+  }
+
+  getBlockAtIdx(idx) {
+    return this.blocks[idx]
   }
 
   getCodes(contentType = 'javascript') {

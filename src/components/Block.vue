@@ -14,6 +14,8 @@ import 'codemirror/mode/javascript/javascript.js'
 import { marked } from 'marked'
 import mdOption from '@/config/marked.js'
 
+import Block from './Block.vue'
+
 marked.setOptions(mdOption)
 
 const props = defineProps({
@@ -67,11 +69,6 @@ function initEditMode() {
     textEl.value && textEl.value.focus()
   })
 
-  // if (formData.value.contentType !== 'javascript') {
-  //   nextTick(resize)
-  //   return
-  // }
-
   nextTick(() => {
     const options = { ...cmOption }
     if (formData.value.contentType === 'markdown') options.lineNumbers = false
@@ -94,6 +91,7 @@ function initEditMode() {
     })
   })
 }
+
 watch(
   () => props.openEditor,
   () => {
@@ -108,7 +106,7 @@ const ctId = randomId()
 </script>
 
 <template>
-  <div class="block">
+  <div class="block" @dblclick.prevent.stop="initEditMode" @keydown.enter.stop>
     <div v-if="editing" style="margin: 0 1rem">
       <form @submit.prevent="onSubmit" @keydown.enter.ctrl="onSubmit">
         <div>
@@ -148,6 +146,13 @@ const ctId = randomId()
         <pre><code :class="`language-${block.contentType}`">{{ block.content }}</code></pre>
       </div>
     </div>
+
+    <block
+      v-for="b in block.children"
+      :block="b"
+      :key="b"
+      style="margin-left: 1em"
+    ></block>
   </div>
 </template>
 

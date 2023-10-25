@@ -7,7 +7,7 @@ import Selection from '@/utils/selection.js'
 import Block from './Block.vue'
 import HList from './HList.vue'
 
-const debugMark = Math.round(Math.random() * 100000000)
+// const debugMark = Math.round(Math.random() * 100000000)
 
 // const _notebook = await Notebook.loadFromFile()
 const note = ref(null)
@@ -38,6 +38,7 @@ async function save() {
   savingToFile.value = false
 }
 
+const editingBlock = ref(null)
 function addBlock(attrs = {}) {
   let block = null
   if (selection.onlyOne) {
@@ -60,21 +61,10 @@ function addBlock(attrs = {}) {
   return block
 }
 
-// init editor mode on double click
-
-const editingBlock = ref(null)
-function initEditorMode(block) {
-  if (!block.isEditable) return
-  editingBlock.value = block
-}
-function exitEditorMode() {
-  editingBlock.value = null
-}
-
 // 按下 enter 的時候在當前位置插入 block
 document.addEventListener('keydown', (e) => {
   if (!selection.onlyOne) return
-  if (editingBlock.value) return
+  // if (editingBlock.value) return
   if (e.key !== 'Enter') return
   if (e.ctrlKey || e.metaKey) return
 
@@ -84,7 +74,7 @@ document.addEventListener('keydown', (e) => {
 // 按住 alt + 箭頭時上下移動 block
 document.addEventListener('keydown', (e) => {
   if (!selection.any) return
-  if (editingBlock.value) return
+  // if (editingBlock.value) return
   if (!(e.metaKey || e.altKey)) return // alt
   if (!['ArrowUp', 'ArrowDown'].includes(e.key)) return
 
@@ -103,6 +93,22 @@ document.addEventListener('keydown', (e) => {
     }
   })
 })
+
+// // 按住 tab 改變層級
+// document.addEventListener('keydown', (e) => {
+//   if (!selection.any) return
+//   if (e.key !== 'Tab') return
+
+//   const block = selection.first
+//   if (e.shiftKey) {
+//     // pending
+//   } else {
+//     const pv = block.prevNode
+//     if (pv) {
+//       pv.addChild(block)
+//     }
+//   }
+// })
 
 class Node {
   constructor(el = null) {
@@ -254,11 +260,9 @@ function run() {
           v-for="block in note.blocks"
           :key="block.id"
           :block="block"
-          :open-editor="editingBlock === block"
           :class="{ selected: selection.has(block) }"
           @click="select(block)"
-          @after-submit="exitEditorMode()"
-          @dblclick.prevent="initEditorMode(block)"
+          :open-editor="editingBlock === block"
         ></block>
       </div>
     </div>

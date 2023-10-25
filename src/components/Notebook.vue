@@ -123,7 +123,6 @@ class Node {
 
 function filterHeaders() {
   const hs = document.querySelectorAll('.blocks :is(h1, h2, h3, h4, h5, h6)')
-  console.log(hs)
 
   const root = new Node()
   let current = root

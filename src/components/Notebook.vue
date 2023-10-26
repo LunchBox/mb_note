@@ -248,6 +248,63 @@ function onBlockClick(e, block) {
   }
 }
 
+function join(pre = '') {
+  if (!selection.any) return
+
+  const blocks = note.value.blocks
+  const sbs = selection.toArray().filter((b) => b.isMarkdown)
+  const idxs = sbs.map((b) => blocks.indexOf(b))
+
+  const minIdx = Math.min(...idxs)
+
+  const content = sbs
+    .map((b) => b.content || '')
+    .filter((str) => str.trim() !== '')
+    .map((str) => pre + str.trim())
+    .join('\r\n')
+
+  const attrs = {
+    contentType: 'markdown',
+    content
+  }
+
+  sbs.forEach((b) => note.value.deleteBlock(b))
+  const block = note.value.addBlock(minIdx, attrs)
+  selection.select(block)
+}
+
+function toList() {
+  join('- ')
+}
+
+function split(conv = (x) => x) {
+  if (!selection.any) return
+
+  const blocks = note.value.blocks
+  const sbs = selection.toArray().filter((b) => b.isMarkdown)
+
+  selection.clear()
+  sbs.forEach((b) => {
+    if (!b.content || b.content.trim() === '') return
+    const idx = blocks.indexOf(b)
+    blocks.splice(idx, 1)
+    b.content.split('\n').forEach((line, i) => {
+      if (line.trim() === '') return
+
+      const attrs = {
+        contentType: 'markdown',
+        content: conv(line)
+      }
+      const block = note.value.addBlock(idx + i, attrs)
+      selection.add(block)
+    })
+  })
+}
+
+function unList() {
+  return split((str) => str.replace(/^-\s+/, ''))
+}
+
 // paste file
 
 function blobtoDataURL(blob, callback) {
@@ -324,9 +381,13 @@ function run() {
           <button @click.prevent="save">
             {{ savingToFile ? 'Saving...' : 'Save' }}
           </button>
-          <a href="#" @click.prevent="addBlock">Add Block</a>
-          <a href="#" @click.prevent="deleteBlocks">Delete Selected</a>
+          <button @click.prevent="addBlock">+</button>
+          <button @click.prevent="deleteBlocks">D</button>
 
+          <button @click.prevent="join()">Comb</button>
+          <button @click.prevent="split()">Split</button>
+          <button @click.prevent="toList">List</button>
+          <button @click.prevent="unList">unList</button>
           <!-- <a href="#" @click.prevent="run">Run</a> -->
         </div>
 
@@ -371,7 +432,7 @@ h2 {
 .toolbar {
   padding: 0.5rem 0;
   display: flex;
-  gap: 0 0.5rem;
+  gap: 0 4px;
 }
 
 .selected {

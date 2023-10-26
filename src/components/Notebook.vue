@@ -288,14 +288,41 @@ function split(conv = (x) => x) {
     if (!b.content || b.content.trim() === '') return
     const idx = blocks.indexOf(b)
     blocks.splice(idx, 1)
-    b.content.split('\n').forEach((line, i) => {
-      if (line.trim() === '') return
+
+    let codeStart = false
+    let code = []
+    let offset = 0
+    b.content.split('\n').forEach((line) => {
+      // if (line.trim() === '') return
+      let content = line.trim()
+
+      if (!codeStart && content.includes('```')) {
+        codeStart = true
+        code = []
+      }
+
+      if (codeStart) {
+        if (content.includes('```')) {
+          codeStart = false
+          content = code.join('\n')
+          code = []
+        } else {
+          code.push(line)
+        }
+      }
+
+      // 到這裡還是 codeStart 就不必處理
+      if (codeStart) return
+      if (content.trim() === '') return
+
+      console.log(content)
 
       const attrs = {
         contentType: 'markdown',
-        content: conv(line)
+        content: conv(content)
       }
-      const block = note.value.addBlock(idx + i, attrs)
+      const block = note.value.addBlock(idx + offset, attrs)
+      offset += 1
       selection.add(block)
     })
   })

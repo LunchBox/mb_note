@@ -81,27 +81,32 @@ document.addEventListener('keydown', (e) => {
   editingBlock.value = selection.first
 })
 
-// 按住 alt + 箭頭 / jk 時上下移動 block
+// 按住 alt + 箭頭 / jk 時上下移動 blocks
 document.addEventListener('keydown', (e) => {
   if (!selection.any) return
   if (!(e.metaKey || e.altKey)) return // alt
   if (!['ArrowUp', 'ArrowDown', 'j', 'k'].includes(e.key)) return
 
-  selection.toArray().forEach((block) => {
-    const _blocks = note.value.blocks
-    const idx = _blocks.indexOf(block)
-    if (idx < 0) return
+  const blocks = note.value.blocks
+  const sbs = selection.toArray()
+  const idxs = sbs.map((b) => blocks.indexOf(b)).sort()
 
-    if (['ArrowUp', 'k'].includes(e.key) && idx > 0) {
-      _blocks.splice(idx, 1)
-      _blocks.splice(idx - 1, 0, block)
-    }
+  if (['ArrowUp', 'k'].includes(e.key)) {
+    if (Math.min(...idxs) < 1) return
+    idxs.forEach((idx) => {
+      const b = blocks.splice(idx, 1).pop()
+      blocks.splice(idx - 1, 0, b)
+    })
+  }
 
-    if (['ArrowDown', 'j'].includes(e.key) && idx < _blocks.length - 1) {
-      _blocks.splice(idx, 1)
-      _blocks.splice(idx + 1, 0, block)
-    }
-  })
+  if (['ArrowDown', 'j'].includes(e.key)) {
+    if (Math.max(...idxs) >= blocks.length - 1) return
+    idxs.reverse()
+    idxs.forEach((idx) => {
+      const b = blocks.splice(idx, 1).pop()
+      blocks.splice(idx + 1, 0, b)
+    })
+  }
 })
 
 // j,k 上下移動光標
@@ -233,8 +238,12 @@ function deleteBlocks() {
   selection.clear()
 }
 
-function select(block) {
-  selection.select(block)
+function onBlockClick(e, block) {
+  if (e.ctrlKey) {
+    selection.toggle(block)
+  } else {
+    selection.select(block)
+  }
 }
 
 // paste file
@@ -333,7 +342,7 @@ function run() {
           :block="block"
           :class="{ selected: selection.has(block) }"
           :open-editor="editingBlock === block"
-          @click="select(block)"
+          @click="onBlockClick($event, block)"
           @after-submit="editingBlock = null"
         ></block>
       </div>

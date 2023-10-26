@@ -143,6 +143,27 @@ document.addEventListener('keydown', (e) => {
   }
 })
 
+// + - 改變標題
+document.addEventListener('keydown', (e) => {
+  if (!selection.any) return
+  if (e.metaKey || e.altKey) return
+  if (!['+', '-'].includes(e.key)) return
+
+  const blocks = selection.toArray().filter((b) => b.isMarkdown)
+
+  blocks.forEach((b) => {
+    if (b.content === null || b.content === undefined) return
+    if (b.content.startsWith('#')) {
+      const len = b.content.slice(0, 6).match(/^#+/)[0].length
+      if (len > 1 && e.key === '+') b.content = b.content.slice(1).trim()
+      if (len < 6 && e.key === '-') b.content = '#' + b.content
+      if (len === 6 && e.key === '-') b.content = b.content.slice(6).trim()
+    } else {
+      if (e.key === '+') b.content = '###### ' + b.content
+    }
+  })
+})
+
 // // 按住 tab 改變層級
 // document.addEventListener('keydown', (e) => {
 //   if (!selection.any) return

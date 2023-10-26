@@ -47,7 +47,11 @@ class Selection {
   }
 
   get first() {
-    return this.toArray()[0]
+    return this.toArray().shift()
+  }
+
+  get last() {
+    return this.toArray().pop()
   }
 }
 

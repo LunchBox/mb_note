@@ -81,26 +81,66 @@ document.addEventListener('keydown', (e) => {
   editingBlock.value = selection.first
 })
 
-// 按住 alt + 箭頭時上下移動 block
+// 按住 alt + 箭頭 / jk 時上下移動 block
 document.addEventListener('keydown', (e) => {
   if (!selection.any) return
   if (!(e.metaKey || e.altKey)) return // alt
-  if (!['ArrowUp', 'ArrowDown'].includes(e.key)) return
+  if (!['ArrowUp', 'ArrowDown', 'j', 'k'].includes(e.key)) return
 
   selection.toArray().forEach((block) => {
     const _blocks = note.value.blocks
     const idx = _blocks.indexOf(block)
     if (idx < 0) return
 
-    if (e.key === 'ArrowUp' && idx > 0) {
+    if (['ArrowUp', 'k'].includes(e.key) && idx > 0) {
       _blocks.splice(idx, 1)
       _blocks.splice(idx - 1, 0, block)
     }
-    if (e.key === 'ArrowDown' && idx < _blocks.length - 1) {
+
+    if (['ArrowDown', 'j'].includes(e.key) && idx < _blocks.length - 1) {
       _blocks.splice(idx, 1)
       _blocks.splice(idx + 1, 0, block)
     }
   })
+})
+
+// j,k 上下移動光標
+document.addEventListener('keydown', (e) => {
+  if (e.metaKey || e.altKey) return
+  if (!['j', 'k'].includes(e.key)) return
+
+  const blocks = note.value.blocks
+
+  // 如果沒有選中任何 block，就選第一個
+  if (!selection.any && blocks[0]) {
+    selection.select(blocks[0])
+  }
+
+  const first = selection.first
+  const last = selection.last
+  let node = e.key === 'j' ? last.nextNode : first.prevNode
+  if (!node) node = e.key === 'j' ? blocks.at(0) : blocks.at(-1)
+  if (node) selection.select(node)
+})
+
+// dd 刪除一段
+let deleteMode = false
+document.addEventListener('keydown', (e) => {
+  if (!selection.any) return
+  if (e.metaKey || e.altKey) return
+
+  // 任何除了 d 的鍵被按下就取消 deleteMode
+  if (!['d'].includes(e.key)) {
+    deleteMode = false
+    return
+  }
+
+  if (deleteMode) {
+    deleteBlocks()
+    deleteMode = false
+  } else {
+    deleteMode = true
+  }
 })
 
 // // 按住 tab 改變層級
@@ -118,15 +158,6 @@ document.addEventListener('keydown', (e) => {
 //     }
 //   }
 // })
-
-// j,k 上下移動
-document.addEventListener('keydown', (e) => {
-  if (!selection.any) return
-  if (!['j', 'k'].includes(e.key)) return
-  const node =
-    e.key === 'j' ? selection.first.nextNode : selection.first.prevNode
-  if (node) selection.select(node)
-})
 
 class Node {
   constructor(el = null) {
@@ -178,6 +209,7 @@ function deleteBlocks() {
   selection.toArray().forEach((block) => {
     note.value.deleteBlock(block)
   })
+  selection.clear()
 }
 
 function select(block) {

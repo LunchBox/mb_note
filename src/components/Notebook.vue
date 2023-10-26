@@ -315,8 +315,6 @@ function split(conv = (x) => x) {
       if (codeStart) return
       if (content.trim() === '') return
 
-      console.log(content)
-
       const attrs = {
         contentType: 'markdown',
         content: conv(content)

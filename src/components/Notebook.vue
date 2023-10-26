@@ -89,7 +89,9 @@ document.addEventListener('keydown', (e) => {
 
   const blocks = note.value.blocks
   const sbs = selection.toArray()
-  const idxs = sbs.map((b) => blocks.indexOf(b)).sort()
+  const idxs = sbs
+    .map((b) => blocks.indexOf(b))
+    .sort((a, b) => (a > b ? 1 : -1))
 
   if (['ArrowUp', 'k'].includes(e.key)) {
     if (Math.min(...idxs) < 1) return

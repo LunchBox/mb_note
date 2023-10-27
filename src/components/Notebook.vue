@@ -7,10 +7,16 @@ import Selection from '@/utils/selection.js'
 import Block from './Block.vue'
 import HList from './HList.vue'
 
+import bindShiftJK from './hotkeys/shift_jk.js'
+import bindAltJK from './hotkeys/alt_jk.js'
+import bindJK from './hotkeys/jk.js'
+import bindDD from './hotkeys/dd.js'
+
 // const debugMark = Math.round(Math.random() * 100000000)
 
 // const _notebook = await Notebook.loadFromFile()
 const note = ref(null)
+const blocks = computed(() => note.value.blocks)
 
 async function pickFile() {
   const _nb = await Notebook.loadFromFile()
@@ -82,73 +88,34 @@ document.addEventListener('keydown', (e) => {
 })
 
 // 按住 alt + 箭頭 / jk 時上下移動 blocks
-document.addEventListener('keydown', (e) => {
-  if (!selection.any) return
-  if (!(e.metaKey || e.altKey)) return // alt
-  if (!['ArrowUp', 'ArrowDown', 'j', 'k'].includes(e.key)) return
-
-  const blocks = note.value.blocks
-  const sbs = selection.toArray()
-  const idxs = sbs
-    .map((b) => blocks.indexOf(b))
-    .sort((a, b) => (a > b ? 1 : -1))
-
-  if (['ArrowUp', 'k'].includes(e.key)) {
-    if (Math.min(...idxs) < 1) return
-    idxs.forEach((idx) => {
-      const b = blocks.splice(idx, 1).pop()
-      blocks.splice(idx - 1, 0, b)
-    })
-  }
-
-  if (['ArrowDown', 'j'].includes(e.key)) {
-    if (Math.max(...idxs) >= blocks.length - 1) return
-    idxs.reverse()
-    idxs.forEach((idx) => {
-      const b = blocks.splice(idx, 1).pop()
-      blocks.splice(idx + 1, 0, b)
-    })
-  }
-})
+bindAltJK(blocks, selection)
 
 // j,k 上下移動光標
-document.addEventListener('keydown', (e) => {
-  if (e.metaKey || e.altKey) return
-  if (!['j', 'k'].includes(e.key)) return
+bindJK(blocks, selection)
 
-  const blocks = note.value.blocks
+// shift + j,k 上下選擇，勉強能用
+bindShiftJK(blocks, selection)
 
-  // 如果沒有選中任何 block，就選第一個
-  if (!selection.any && blocks[0]) {
-    selection.select(blocks[0])
-  }
+// dd 刪除
+bindDD(blocks, selection, deleteBlocks)
+// let deleteMode = false
+// document.addEventListener('keydown', (e) => {
+//   if (!selection.any) return
+//   if (e.metaKey || e.altKey) return
 
-  const first = selection.first
-  const last = selection.last
-  let node = e.key === 'j' ? last.nextNode : first.prevNode
-  if (!node) node = e.key === 'j' ? blocks.at(0) : blocks.at(-1)
-  if (node) selection.select(node)
-})
+//   // 任何除了 d 的鍵被按下就取消 deleteMode
+//   if (!['d'].includes(e.key)) {
+//     deleteMode = false
+//     return
+//   }
 
-// dd 刪除一段
-let deleteMode = false
-document.addEventListener('keydown', (e) => {
-  if (!selection.any) return
-  if (e.metaKey || e.altKey) return
-
-  // 任何除了 d 的鍵被按下就取消 deleteMode
-  if (!['d'].includes(e.key)) {
-    deleteMode = false
-    return
-  }
-
-  if (deleteMode) {
-    deleteBlocks()
-    deleteMode = false
-  } else {
-    deleteMode = true
-  }
-})
+//   if (deleteMode) {
+//     deleteBlocks()
+//     deleteMode = false
+//   } else {
+//     deleteMode = true
+//   }
+// })
 
 // + - 改變標題
 document.addEventListener('keydown', (e) => {

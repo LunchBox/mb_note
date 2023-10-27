@@ -169,7 +169,7 @@ textarea {
 }
 
 pre {
-  font-size: 13px;
+  /* font-size: 13px; */
   background: #f5f7fa;
   border-radius: 3px;
   tab-size: 2;
@@ -216,8 +216,14 @@ img {
   line-height: 1.35;
 }
 
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 12px;
+}
+
 .view.markdown pre {
-  font-size: 13px;
+  /* font-size: 12px; */
   background: #f5f7fa;
   border-radius: 3px;
   padding: 1em;

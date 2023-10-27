@@ -98,24 +98,6 @@ bindShiftJK(blocks, selection)
 
 // dd 刪除
 bindDD(blocks, selection, deleteBlocks)
-// let deleteMode = false
-// document.addEventListener('keydown', (e) => {
-//   if (!selection.any) return
-//   if (e.metaKey || e.altKey) return
-
-//   // 任何除了 d 的鍵被按下就取消 deleteMode
-//   if (!['d'].includes(e.key)) {
-//     deleteMode = false
-//     return
-//   }
-
-//   if (deleteMode) {
-//     deleteBlocks()
-//     deleteMode = false
-//   } else {
-//     deleteMode = true
-//   }
-// })
 
 // + - 改變標題
 document.addEventListener('keydown', (e) => {
@@ -210,6 +192,21 @@ function deleteBlocks() {
 function onBlockClick(e, block) {
   if (e.ctrlKey) {
     selection.toggle(block)
+  } else if (e.shiftKey) {
+    const idxs = selection.toArray().map((b) => blocks.value.indexOf(b))
+    const currentIdx = blocks.value.indexOf(block)
+    if (idxs.includes(currentIdx)) return
+    if (currentIdx < Math.min(...idxs)) {
+      selection.clear()
+      blocks.value
+        .slice(currentIdx, Math.max(...idxs) + 1)
+        .forEach((b) => selection.add(b))
+    } else if (currentIdx > Math.max(...idxs)) {
+      selection.clear()
+      blocks.value
+        .slice(Math.min(...idxs), currentIdx + 1)
+        .forEach((b) => selection.add(b))
+    }
   } else {
     selection.select(block)
   }

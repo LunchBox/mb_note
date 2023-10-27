@@ -387,9 +387,7 @@ function run() {
 <template>
   <div>
     <div v-if="!note">
-      <button @click.prevent="pickFile">
-        Pick a .jsnb file(or create a blank file with .jsnb ext)
-      </button>
+      <button @click.prevent="pickFile">Pick or Drop a .jsnb file</button>
     </div>
     <div v-else @paste="onPaste">
       <div class="page-head">

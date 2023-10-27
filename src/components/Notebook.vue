@@ -263,9 +263,7 @@ function split(conv = (x) => x) {
       if (!codeStart && content.includes('```')) {
         codeStart = true
         code = []
-      }
-
-      if (codeStart) {
+      } else if (codeStart) {
         if (content.includes('```')) {
           codeStart = false
           content = code.join('\n')
@@ -278,6 +276,8 @@ function split(conv = (x) => x) {
       // 到這裡還是 codeStart 就不必處理
       if (codeStart) return
       if (content.trim() === '') return
+
+      console.log(content)
 
       const attrs = {
         contentType: 'markdown',

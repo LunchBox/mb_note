@@ -171,8 +171,8 @@ textarea {
 
 pre {
   font-size: 13px;
-  background: #f6f6f6;
-  border-radius: 0.5rem;
+  background: #f5f7fa;
+  border-radius: 3px;
   tab-size: 2;
 }
 .block {
@@ -217,10 +217,10 @@ img {
   line-height: 1.35;
 }
 
-.markdown pre {
-  background: #f6f6f6;
-  border-radius: 0.5rem;
-  /* font-size: 13px; */
+.view.markdown pre {
+  font-size: 13px;
+  background: #f5f7fa;
+  border-radius: 3px;
 }
 
 .block pre code.hljs {

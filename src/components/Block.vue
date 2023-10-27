@@ -169,9 +169,7 @@ textarea {
 }
 
 pre {
-  /* font-size: 13px; */
   background: #f5f7fa;
-  border-radius: 3px;
   tab-size: 2;
 }
 .block {
@@ -223,9 +221,7 @@ pre {
 }
 
 .view.markdown pre {
-  /* font-size: 12px; */
   background: #f5f7fa;
-  border-radius: 3px;
   padding: 1em;
 }
 

@@ -56,8 +56,7 @@ class Notebook extends Base {
   //   setItem(StorageKey, this)
   // }
 
-  static async loadFromFile() {
-    const [fileHandle] = await window.showOpenFilePicker(FILE_OPTIONS)
+  static async loadFromFileHandle(fileHandle) {
     const file = await fileHandle.getFile()
     const content = await file.text()
 
@@ -78,6 +77,31 @@ class Notebook extends Base {
     } else {
       throw new Error('failed to load file!')
     }
+  }
+
+  static async loadFromFile() {
+    const [fileHandle] = await window.showOpenFilePicker(FILE_OPTIONS)
+    return await this.loadFromFileHandle(fileHandle)
+    // const file = await fileHandle.getFile()
+    // const content = await file.text()
+
+    // if (typeof content === 'string') {
+    //   const str = content.trim() === '' ? undefined : JSON.parse(content)
+    //   const nb = new Notebook(str)
+    //   nb._fileHandle = fileHandle
+    //   nb._filename = file.name
+
+    //   try {
+    //     await fileHandle.createWritable() // fire a write confirm box to ask permission
+    //     nb._allowSave = true
+    //   } catch (err) {
+    //     console.log(err)
+    //   }
+
+    //   return nb
+    // } else {
+    //   throw new Error('failed to load file!')
+    // }
   }
 
   async saveToFile() {

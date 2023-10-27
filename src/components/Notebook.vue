@@ -23,6 +23,35 @@ async function pickFile() {
   note.value = _nb
 }
 
+// https://stackoverflow.com/questions/68497308/how-to-use-html5-drag-drop-functionality-with-filesystemapi
+document.body.addEventListener('drop', async (e) => {
+  // Prevent navigation.
+  e.preventDefault()
+  // Process all of the items.
+  for (const item of e.dataTransfer.items) {
+    // Careful: `kind` will be 'file' for both file
+    // _and_ directory entries.
+    if (item.kind === 'file') {
+      const fileHandle = await item.getAsFileSystemHandle()
+      const fn = fileHandle.name.split('.').pop()
+      if (fn === 'jsnb') {
+        const _nb = await Notebook.loadFromFileHandle(fileHandle)
+        note.value = _nb
+      } else {
+        alert('not a *.jsnb file')
+      }
+      // if (entry.kind === 'directory') {
+      //   handleDirectoryEntry(entry);
+      // } else {
+      //   handleFileEntry(entry);
+      // }
+    }
+  }
+})
+
+// prevent new window on drop
+document.body.addEventListener('dragover', (e) => e.preventDefault())
+
 const headers = ref(null)
 
 watch(

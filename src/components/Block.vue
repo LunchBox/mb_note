@@ -131,7 +131,6 @@ const ctId = randomId()
       <div
         v-if="block.contentType === 'markdown'"
         v-html="mdContent"
-        v-highlight
         class="view markdown"
       ></div>
       <div v-else-if="block.isImage" class="view image">
@@ -221,6 +220,7 @@ img {
   font-size: 13px;
   background: #f5f7fa;
   border-radius: 3px;
+  padding: 1em;
 }
 
 .block pre code.hljs {

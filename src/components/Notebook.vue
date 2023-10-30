@@ -171,7 +171,7 @@ class Node {
     if (el === null) {
       this.lv = '0'
     } else {
-      this.id = randomId()
+      this.id = 'h' + randomId()
       el.id = this.id
       const m = el.tagName.match(/H(\d)/)
       this.lv = m[1]

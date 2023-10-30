@@ -12,7 +12,7 @@ import hljs from 'highlight.js'
 // hljs.registerLanguage('html', html)
 // hljs.registerLanguage('css', css)
 import 'highlight.js/styles/github.css'
-import 'highlight.js/styles/github-dark.css'
+// import 'highlight.js/styles/github-dark.css'
 
 const app = createApp(App)
 

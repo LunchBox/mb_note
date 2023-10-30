@@ -179,7 +179,7 @@ textarea {
 
 pre {
   background: #f5f7fa;
-  background: #333;
+  /* background: #333; */
   tab-size: 2;
 }
 .block {
@@ -232,8 +232,8 @@ pre {
 
 .view.markdown pre {
   background: #f5f7fa;
-  background: #333;
-  color: #c9d1d9;
+  /* background: #333; */
+  /* color: #c9d1d9; */
   padding: 1em;
 }
 

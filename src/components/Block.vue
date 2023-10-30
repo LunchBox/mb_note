@@ -51,7 +51,10 @@ function format(content) {
 
 function onSubmit() {
   const attrs = { ...formData.value }
-  attrs.content = format(attrs.content)
+
+  if (!attrs.noAutoforamt) {
+    attrs.content = format(attrs.content)
+  }
 
   props.block.update(attrs)
   editing.value = false
@@ -83,10 +86,12 @@ function initEditMode() {
       if (e.code === 'KeyS' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault()
 
-        let content = format(cm.getValue())
-        cm.getDoc().setValue(content)
+        if (!formData.value.noAutoforamt) {
+          const content = format(cm.getValue())
+          cm.getDoc().setValue(content)
 
-        formData.value.content = content
+          formData.value.content = content
+        }
       }
     })
   })
@@ -123,6 +128,10 @@ const ctId = randomId()
               {{ ct }}
             </option>
           </datalist>
+          <label>
+            <input type="checkbox" v-model="formData.noAutoforamt" />
+            noAutoFormat
+          </label>
           <input type="submit" value="update" />
         </div>
       </form>
@@ -170,6 +179,7 @@ textarea {
 
 pre {
   background: #f5f7fa;
+  background: #333;
   tab-size: 2;
 }
 .block {
@@ -222,6 +232,8 @@ pre {
 
 .view.markdown pre {
   background: #f5f7fa;
+  background: #333;
+  color: #c9d1d9;
   padding: 1em;
 }
 

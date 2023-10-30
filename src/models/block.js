@@ -13,6 +13,7 @@ class Block extends Base {
     this.fileName = null
 
     this.children = []
+    this.noAutoforamt = false
 
     this.loadAttrs(attrs)
 

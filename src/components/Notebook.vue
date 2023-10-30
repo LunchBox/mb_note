@@ -1,5 +1,7 @@
 <script setup>
 import { ref, watch, computed, nextTick } from 'vue'
+import { saveAs } from 'file-saver'
+
 import { randomId } from '@/utils/random.js'
 import Notebook from '@/models/notebook.js'
 import Selection from '@/utils/selection.js'
@@ -364,6 +366,17 @@ function onPaste(event) {
   })
 }
 
+// export
+
+function exportMD() {
+  const str = note.value?.exportMarkdown()
+
+  const blob = new Blob([str], { type: 'text/plain;charset=utf-8' })
+  const ns = note.value?._filename?.split('.')
+  const fn = ns ? ns.slice(0, -1).join('_') : 'unnamed'
+  saveAs(blob, `${fn}.md`)
+}
+
 // run the JS code
 
 const codes = computed(() => {
@@ -404,6 +417,7 @@ function run() {
           <button @click.prevent="split()">Split</button>
           <button @click.prevent="toList">List</button>
           <button @click.prevent="unList">unList</button>
+          <button @click.prevent="exportMD">export</button>
           <!-- <a href="#" @click.prevent="run">Run</a> -->
         </div>
 

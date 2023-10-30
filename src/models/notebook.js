@@ -114,6 +114,20 @@ class Notebook extends Base {
     return JSON.stringify(this, replacer)
   }
 
+  exportMarkdown() {
+    return this.blocks
+      .map((b) => {
+        if (b.isMarkdown) {
+          return b.content
+        } else if (b.isFile) {
+          // just skit it
+        } else {
+          return '``` ' + b.contentType + '\r\n' + b.content + '\r\n```'
+        }
+      })
+      .join('\r\n\r\n')
+  }
+
   addBlock(idx = -1, attrs = {}) {
     const block = new Block(attrs)
     block._parent = this

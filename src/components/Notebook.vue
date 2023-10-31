@@ -183,6 +183,11 @@ class Node {
     this.parent = null
     this.children = []
   }
+
+  setIndex(idx) {
+    this.indexMark = idx
+    this._el.setAttribute('data-index', idx)
+  }
 }
 
 function filterHeaders() {
@@ -203,7 +208,7 @@ function filterHeaders() {
       // 向下 indent 一層
       current.children.push(node)
       node.parent = current
-      node.indexMark = appendIdx(current)
+      node.setIndex(appendIdx(current))
       current = node
     } else if (node.lv < current.lv) {
       // 向上 pop up
@@ -212,11 +217,9 @@ function filterHeaders() {
     } else {
       current.parent.children.push(node)
       node.parent = current.parent
-      node.indexMark = appendIdx(current.parent)
+      node.setIndex(appendIdx(current.parent))
       current = node
     }
-
-    el.setAttribute('data-index', node.indexMark + ' ')
   }
 
   hs.forEach(applyNode)
@@ -494,5 +497,6 @@ h4:before,
 h5:before,
 h6:before {
   content: attr(data-index);
+  margin-right: 0.5em;
 }
 </style>

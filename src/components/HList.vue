@@ -17,7 +17,10 @@ function scrollTo(id) {
 <template>
   <ul v-if="node">
     <li v-for="c in node.children" :key="c">
-      <a href="#" @click.prevent="scrollTo(c.id)">{{ c.text }}</a>
+      <a href="#" @click.prevent="scrollTo(c.id)">
+        {{ c.indexMark }}.
+        {{ c.text }}
+      </a>
       <h-list :node="c"></h-list>
     </li>
   </ul>

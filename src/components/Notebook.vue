@@ -170,6 +170,7 @@ document.addEventListener('keydown', (e) => {
 class Node {
   constructor(el = null) {
     this._el = el
+    this.indexMark = ''
     if (el === null) {
       this.lv = '0'
     } else {
@@ -190,21 +191,32 @@ function filterHeaders() {
   const root = new Node()
   let current = root
 
+  const appendIdx = (node) => {
+    return [node?.indexMark, node?.children?.length].filter((x) => x).join('.')
+  }
+
   const applyNode = (el) => {
     const node = new Node(el)
 
+    // calc level & index mark
     if (node.lv > current.lv) {
+      // 向下 indent 一層
       current.children.push(node)
       node.parent = current
+      node.indexMark = appendIdx(current)
       current = node
     } else if (node.lv < current.lv) {
+      // 向上 pop up
       current = current.parent
       applyNode(el)
     } else {
       current.parent.children.push(node)
       node.parent = current.parent
+      node.indexMark = appendIdx(current.parent)
       current = node
     }
+
+    el.setAttribute('data-index', node.indexMark + ' ')
   }
 
   hs.forEach(applyNode)
@@ -471,5 +483,16 @@ h2 {
 
 .blocks {
   max-width: 800px;
+}
+</style>
+
+<style>
+h1:before,
+h2:before,
+h3:before,
+h4:before,
+h5:before,
+h6:before {
+  content: attr(data-index);
 }
 </style>

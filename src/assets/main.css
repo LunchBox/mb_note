@@ -1,9 +1,11 @@
 @import './base.css';
 
 #app {
-  max-width: 800px;
+  max-width: 960px;
   margin: 0 auto;
   font-weight: normal;
+	background: #fff;
+	overflow: auto;
 }
 
 a,
